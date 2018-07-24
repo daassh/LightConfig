@@ -1,0 +1,7 @@
+.cache
+.pytest_cache
+.tox
+build
+dist
+lightconfig.egg-info
+package.txt

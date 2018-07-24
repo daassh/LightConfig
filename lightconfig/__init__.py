@@ -1,0 +1,1 @@
+from .lightconfig import LightConfig
