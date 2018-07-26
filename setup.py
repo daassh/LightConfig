@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='lightconfig',
-    version='0.0.4',
+    version='0.0.5',
     description=(
         'LightConfig is a simple library to make user read or write config'
     ),

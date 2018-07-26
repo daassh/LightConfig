@@ -12,7 +12,6 @@ True
 >>> "option1" in cfg.section1
 True
 """
-import sys
 import os
 import codecs
 import locale
@@ -33,9 +32,9 @@ class ConfigParserOptionCaseSensitive(ConfigParser):
 
 
 class LightConfig:
-    def __init__(self, config_path, try_encoding=['utf-8', 'utf-8-sig', locale.getpreferredencoding()], try_convert_digit = True):
+    def __init__(self, config_path, try_encoding={'utf-8', 'utf-8-sig', locale.getpreferredencoding().lower()}, try_convert_digit = True):
         self._config_path = config_path
-        self._try_encoding = try_encoding if isinstance(try_encoding, list) else [try_encoding]
+        self._try_encoding = try_encoding if isinstance(try_encoding, (list, tuple, set)) else [try_encoding]
         self._try_convert_digit = try_convert_digit
         self._config = ConfigParserOptionCaseSensitive()
         if not os.path.exists(config_path):
@@ -60,6 +59,11 @@ class LightConfig:
 
     __getitem__ = __getattr__
         
+    def __delattr__(self, item):
+        self._config.remove_section(item)
+        
+    __delitem__ = __delattr__
+        
     def as_dict(self):
         res = {}
         for section in self._config.sections():
@@ -75,12 +79,10 @@ class LightConfig:
             try:
                 self._config.readfp(fp)
             except Exception as e:
-                print(e)
                 err = True
             else:
                 err = False
                 self._encoding = encoding
-                sys.stdout.write('read and write config use "{}"\n'.format(encoding))
                 break
         if err:
             raise UnicodeError("\"{}\" codec can't decode this config file".format(', '.join(self._try_encoding)))
@@ -132,6 +134,11 @@ class LightConfig:
                 self.__dict__[key] = value
 
         __setitem__ = __setattr__
+        
+        def __delattr__(self, item):
+            self._conf._config.remove_option(self._section, item)
+            
+        __delitem__ = __delattr__
                 
         def as_dict(self):
             return dict(self._conf._config.items(self._section))
