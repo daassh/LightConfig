@@ -17,7 +17,6 @@ def test_read_write_by_attr():
         cfg.section2.chinese = '你好'
         cfg.section3.japanese = 'こんにちは'
         # read
-        print(cfg)
         cfg = LightConfig('tmp.ini')
         assert cfg.section1.english == 'hello'
         assert cfg.section2.chinese == '你好'
@@ -25,6 +24,7 @@ def test_read_write_by_attr():
     except:
         if os.path.exists('tmp.ini'):
             os.remove('tmp.ini')
+        raise
             
             
 def test_read_write_by_item():
@@ -35,7 +35,6 @@ def test_read_write_by_item():
         cfg['section2']['chinese'] = '你好'
         cfg['section3']['japanese'] = 'こんにちは'
         # read
-        print(cfg)
         cfg = LightConfig('tmp.ini')
         assert cfg['section1']['english'] == 'hello'
         assert cfg['section2']['chinese'] == '你好'
@@ -43,3 +42,39 @@ def test_read_write_by_item():
     except:
         if os.path.exists('tmp.ini'):
             os.remove('tmp.ini')
+        raise
+        
+
+def test_delete_by_attr():
+    try:
+        # write
+        cfg = LightConfig('tmp.ini')
+        cfg.section1.english = 'hello'
+        cfg.section2.chinese = '你好'
+        # delete
+        del cfg.section1.english
+        assert 'english' not in cfg.section1
+        del cfg.section2
+        assert 'section2' not in cfg
+    except:
+        if os.path.exists('tmp.ini'):
+            os.remove('tmp.ini')
+        raise
+        
+        
+def test_delete_by_item():
+    try:
+        # write
+        cfg = LightConfig('tmp.ini')
+        cfg['section1']['english'] = 'hello'
+        cfg['section2']['chinese'] = '你好'
+        # delete
+        del cfg['section1']['english']
+        assert 'english' not in cfg['section1']
+        del cfg['section2']
+        assert 'section2' not in cfg
+    except:
+        if os.path.exists('tmp.ini'):
+            os.remove('tmp.ini')
+        raise
+        
