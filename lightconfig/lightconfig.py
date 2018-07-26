@@ -64,6 +64,9 @@ class LightConfig:
         
     __delitem__ = __delattr__
         
+    def __contains__(self, item):
+        return self._config.has_section(item)
+        
     def as_dict(self):
         res = {}
         for section in self._config.sections():
@@ -139,6 +142,9 @@ class LightConfig:
             self._conf._config.remove_option(self._section, item)
             
         __delitem__ = __delattr__
+                
+        def __contains__(self, item):
+            return self._conf._config.has_option(self._section, item)
                 
         def as_dict(self):
             return dict(self._conf._config.items(self._section))
