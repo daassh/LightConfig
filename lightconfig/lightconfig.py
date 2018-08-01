@@ -31,7 +31,7 @@ class ConfigParserOptionCaseSensitive(ConfigParser):
         return option_str
 
 
-class LightConfig:
+class LightConfig(object):
     def __init__(self, config_path, try_encoding={'utf-8', 'utf-8-sig', locale.getpreferredencoding().lower()}, try_convert_digit = True):
         self._config_path = config_path
         self._try_encoding = try_encoding if isinstance(try_encoding, (list, tuple, set)) else [try_encoding]
@@ -46,42 +46,60 @@ class LightConfig:
         self._cached_stamp = self._stamp()
     
     def __str__(self):
-        return str(self.as_dict())
+        return str(self._as_dict())
 
     def __repr__(self):
-        return repr(self.as_dict())
+        return repr(self._as_dict())
 
     def __iter__(self):
-        return iter(self._config.sections())
+        return iter(self._as_dict().items())
 
     def __getattr__(self, item):
         return self.Section(self, item, self._try_convert_digit)
 
     __getitem__ = __getattr__
-        
+
+    def __setattr__(self, name, value):
+        if name in ('_config_path', '_try_encoding', '_try_convert_digit', '_encoding', '_config', '_cached_stamp'):
+            super(LightConfig, self).__setattr__(name, value)
+        else:
+            try:
+                value = dict(value)
+            except:
+                raise ValueError('"{}" is not dictable'.format(value))
+            else:
+                section = self.Section(self, name, self._try_convert_digit)
+                for k, v in value.items():
+                    section.__setattr__(k, v)
+                self._save()
+
+    __setitem__ = __setattr__
+
     def __delattr__(self, item):
         self._config.remove_section(item)
-        
+        self._save()
+    
     __delitem__ = __delattr__
-        
+   
     def __contains__(self, item):
         return self._config.has_section(item)
         
-    def as_dict(self):
+    def _as_dict(self):
         res = {}
         for section in self._config.sections():
-            res[section] = dict(self._config.items(section))
+            #res[section] = dict(self._config.items(section))
+            res[section] = self[section]
         return res
 
-    def sections(self):
+    def keys(self):
         return self._config.sections()
-        
+
     def _read(self):
         for encoding in self._try_encoding:
             fp = codecs.open(self._config_path, encoding=encoding)
             try:
                 self._config.readfp(fp)
-            except Exception as e:
+            except:
                 err = True
             else:
                 err = False
@@ -104,13 +122,13 @@ class LightConfig:
             self._try_convert_digit = try_convert_digit
 
         def __str__(self):
-            return str(self.as_dict())
+            return str(self._as_dict())
 
         def __repr__(self):
-            return repr(self.as_dict())
+            return repr(self._as_dict())
             
         def __iter__(self):
-            return iter(self._conf._config.options(self._section))
+            return iter(self._as_dict().items())
 
         def __getattr__(self, option):
             current_stamp = self._conf._stamp()
@@ -140,15 +158,15 @@ class LightConfig:
         
         def __delattr__(self, item):
             self._conf._config.remove_option(self._section, item)
+            self._conf._save()
             
         __delitem__ = __delattr__
                 
         def __contains__(self, item):
             return self._conf._config.has_option(self._section, item)
-                
-        def as_dict(self):
+            
+        def _as_dict(self):
             return dict(self._conf._config.items(self._section))
             
-        def options(self):
+        def keys(self):
             return self._conf._config.options(self._section)
-        
