@@ -71,7 +71,6 @@ class LightConfig(object):
                 section = self.Section(self, name, self._try_convert_digit)
                 for k, v in value.items():
                     section.__setattr__(k, v)
-                self._save()
 
     __setitem__ = __setattr__
 
@@ -87,7 +86,6 @@ class LightConfig(object):
     def _as_dict(self):
         res = {}
         for section in self._config.sections():
-            #res[section] = dict(self._config.items(section))
             res[section] = self[section]
         return res
 
