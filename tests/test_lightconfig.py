@@ -134,7 +134,7 @@ def test_iterable():
         # read
         cfg = LightConfig('tmp.ini')
         for section_k, section_v in cfg:
-            print(section_k,section_v)
+            print(section_k, section_v)
             for option_k, option_v in section_v:
                 assert cfg[section_k][option_k] == option_v
     finally:
