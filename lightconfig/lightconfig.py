@@ -16,9 +16,9 @@ import os
 import codecs
 import locale
 try:
-    from ConfigParser import ConfigParser
+    from ConfigParser import RawConfigParser as ConfigParser
 except ImportError:
-    from configparser import ConfigParser
+    from configparser import RawConfigParser as ConfigParser
 
 
 class ConfigParserOptionCaseSensitive(ConfigParser):
