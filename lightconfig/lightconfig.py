@@ -101,7 +101,10 @@ class LightConfig(object):
         for encoding in self.__dict__['_try_encoding']:
             fp = codecs.open(self.__dict__['_config_path'], encoding=encoding)
             try:
-                self.__dict__['_config'].readfp(fp)
+                if 'read_file' in dir(self.__dict__['_config']):
+                    self.__dict__['_config'].read_file(fp)
+                else:
+                    self.__dict__['_config'].readfp(fp)
             except:
                 err = True
             else:
